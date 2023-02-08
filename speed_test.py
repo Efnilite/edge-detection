@@ -66,7 +66,7 @@ print("=== getdata_resize ===")
 print(f"Total time: {gdr} seconds")
 print(f"Time per iter: {gdr / n} seconds")  # 0.01 secs
 
-# gp = timeit.timeit(lambda: to_rgba_getpixel(to_image('testing/test-image-2.png')), number=n)
-# print("=== getpixel ===")
-# print(f"Total time: {gp} seconds")
-# print(f"Time per iter: {gp / n} seconds")  # 0.83 secs
+gp = timeit.timeit(lambda: to_rgba_getpixel(to_image('testing/test-image-2.png')), number=n)
+print("=== getpixel ===")
+print(f"Total time: {gp} seconds")
+print(f"Time per iter: {gp / n} seconds")  # 0.83 secs
