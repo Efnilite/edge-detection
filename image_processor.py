@@ -23,6 +23,9 @@ def to_luminance(image, shrink):
 
 
 grays = "#@$%&?!*~^;:'+=-_,.` "
+# grays = "#W@$8%M&0GRBENHFKSAX?PQD45O3YZ62TLC7UVJI1!*~wmikltbdfheagypqsjzxnrvouc^;:'+=-_,.` "
+# i just used all the keys on my keyboard lol
+# i prefer the smaller version since letters are distracting but if extended palette is needed you can uncomment it
 
 
 def to_char(luminance):
@@ -31,7 +34,7 @@ def to_char(luminance):
 
 
 def print_grid(pixels):
-    """Prints the final pixel grid."""
+    """Prints the final pixel grid with the provided pixels at the provided positions."""
     to_chars = list(map(lambda row: list(map(to_char, row)), pixels))
 
     print()
@@ -43,6 +46,7 @@ def print_grid(pixels):
 
 
 def print_frame(file):
+    """Prints the specified file."""
     try:
         img = to_image(file)
     except FileNotFoundError:
