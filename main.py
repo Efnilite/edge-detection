@@ -6,19 +6,18 @@ def to_image(src):
     return Image.open(src)
 
 
-def to_rgba_getdata(image, shrink):
+def to_rgba(image, shrink):
     """Returns a 2D-list of all rgba values mapped to the specified detail level."""
-    sizes = image.size
-    width = sizes[0]
-    height = sizes[1]
+    width = int(image.size[0] / shrink)
+    height = int(image.size[1] / shrink)
 
-    image = image.resize((int(width / shrink), int(height / shrink)))
+    image = image.resize((width, height))
+    image.show()
 
     pixels = list(image.getdata())
     final = []
 
     for y in range(height):
-        print(y, pixels[(y * width):((y + 1) * width)])
         final.append(pixels[(y * width):((y + 1) * width)])
 
     return final
@@ -32,13 +31,22 @@ def to_dots(pixels):
     return list(map(lambda row: list(map(to_square, row)), pixels))
 
 
-def print_grid(pixels):
+def print_grid(dots):
+    final = ""
+    for row in dots:
+        final += "".join(row) + "\n"
+
+    print()
+    print(final)
     print()
 
-    for row in pixels:
-        print("".join(row))
 
-    print()
+def print_frame():
+    img = to_image("resources/testing/test-image-1.png")
+    dots = to_dots(to_rgba(img, 8))
+
+    print_grid(dots)
 
 
-to_rgba_getdata(to_image("images/test-image-1.png"), 8)
+if __name__ == '__main__':
+    print_frame()

@@ -56,17 +56,17 @@ def to_rgba_getdata_resize(image, shrink):
 
 
 n = 100
-gd = timeit.timeit(lambda: to_rgba_getdata(to_image('images/test-image-2.png')), number=n)
+gd = timeit.timeit(lambda: to_rgba_getdata(to_image('resources/testing/test-image-2.png')), number=n)
 print("=== getdata ===")
 print(f"Total time: {gd} seconds")
 print(f"Time per iter: {gd / n} seconds")  # 0.1 secs
 
-gdr = timeit.timeit(lambda: to_rgba_getdata_resize(to_image('images/test-image-2.png'), 8), number=n)
+gdr = timeit.timeit(lambda: to_rgba_getdata_resize(to_image('resources/testing/test-image-2.png'), 8), number=n)
 print("=== getdata_resize ===")
 print(f"Total time: {gdr} seconds")
 print(f"Time per iter: {gdr / n} seconds")  # 0.1 secs
 
-# gp = timeit.timeit(lambda: to_rgba_getpixel(to_image('images/test-image-2.png')), number=n)
+# gp = timeit.timeit(lambda: to_rgba_getpixel(to_image('testing/test-image-2.png')), number=n)
 # print("=== getpixel ===")
 # print(f"Total time: {gp} seconds")
 # print(f"Time per iter: {gp / n} seconds")  # 0.83 secs
