@@ -1,15 +1,15 @@
 from PIL import Image
 
 
-def to_image(src):
+def to_image(src_folder):
     """Returns a new Image instance to perform operations on."""
-    return Image.open(src)
+    return Image.open(src_folder)
 
 
-def to_luminance(image, shrink):
+def to_luminance(image, shrink_level=8):
     """Returns a 2D-list of all rgba values mapped to the specified detail level."""
-    width = int(image.size[0] / shrink)
-    height = int(image.size[1] / shrink)
+    width = int(image.size[0] / shrink_level)
+    height = int(image.size[1] / shrink_level)
 
     image = image.resize((width, height)).convert("L")
 
@@ -20,40 +20,3 @@ def to_luminance(image, shrink):
         final.append(pixels[(y * width):((y + 1) * width)])
 
     return final
-
-
-grays = "#@$%&?!*~^;:'+=-_,.` "
-# grays = "#W@$8%M&0GRBENHFKSAX?PQD45O3YZ62TLC7UVJI1!*~wmikltbdfheagypqsjzxnrvouc^;:'+=-_,.` "
-# i just used all the keys on my keyboard lol
-# i prefer the smaller version since letters are distracting but if extended palette is needed you can uncomment it
-
-
-def to_char(luminance):
-    """Transforms a luminance value to an ASCII character."""
-    return grays[int((1 - luminance / 255) * (len(grays) - 1))]
-
-
-def print_grid(pixels):
-    """Prints the final pixel grid with the provided pixels at the provided positions."""
-    to_chars = list(map(lambda row: list(map(to_char, row)), pixels))
-
-    print()
-
-    for row in to_chars:
-        print("".join(row))
-
-    print()
-
-
-def print_frame(file):
-    """Prints the specified file."""
-    try:
-        img = to_image(file)
-    except FileNotFoundError:
-        return None
-
-    dots = to_luminance(img, 8)
-
-    print_grid(dots)
-
-    return True
