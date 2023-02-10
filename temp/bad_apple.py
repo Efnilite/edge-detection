@@ -7,7 +7,7 @@ fps = 30
 sec_time = 218.933333
 
 ns_between_frames = 1 / 30 * 10 ** 9
-ns_init_sleep = 750000  # time to initiate sleep
+ns_init_sleep = 1_000_000  # time to initiate sleep
 
 if __name__ == '__main__':
 

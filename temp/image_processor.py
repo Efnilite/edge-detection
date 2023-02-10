@@ -6,10 +6,10 @@ def to_image(src):
     return Image.open(src)
 
 
-def to_luminance(image, shrink):
+def to_luminance(image):
     """Returns a 2D-list of all rgba values mapped to the specified detail level."""
-    width = int(image.size[0] / shrink)
-    height = int(image.size[1] / shrink)
+    width = int(220)
+    height = int(63)
 
     image = image.resize((width, height)).convert("L")
 
@@ -23,6 +23,8 @@ def to_luminance(image, shrink):
 
 
 grays = "#@$%&?!*~^;:'+=-_,.` "
+
+
 # grays = "#W@$8%M&0GRBENHFKSAX?PQD45O3YZ62TLC7UVJI1!*~wmikltbdfheagypqsjzxnrvouc^;:'+=-_,.` "
 # i just used all the keys on my keyboard lol
 # i prefer the smaller version since letters are distracting but if extended palette is needed you can uncomment it
@@ -37,12 +39,12 @@ def print_grid(pixels):
     """Prints the final pixel grid with the provided pixels at the provided positions."""
     to_chars = list(map(lambda row: list(map(to_char, row)), pixels))
 
-    print()
+    total = ""
 
     for row in to_chars:
-        print("".join(row))
+        total += "".join(row) + "\n"
 
-    print()
+    print(total)
 
 
 def print_frame(file):
@@ -52,7 +54,7 @@ def print_frame(file):
     except FileNotFoundError:
         return None
 
-    dots = to_luminance(img, 8)
+    dots = to_luminance(img)
 
     print_grid(dots)
 

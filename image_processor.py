@@ -20,3 +20,16 @@ def to_luminance(image, shrink_level=8):
         final.append(pixels[(y * width):((y + 1) * width)])
 
     return final
+
+
+grays = "#@$%&?!*~^;:'+=-_,.` "
+
+
+# grays = "#W@$8%M&0GRBENHFKSAX?PQD45O3YZ62TLC7UVJI1!*~wmikltbdfheagypqsjzxnrvouc^;:'+=-_,.` "
+# i just used all the keys on my keyboard lol
+# i prefer the smaller version since letters are distracting but if extended palette is needed you can uncomment it
+
+
+def to_char(luminance):
+    """Transforms a luminance value to an ASCII character."""
+    return grays[int((1 - luminance / 255) * (len(grays) - 1))]
