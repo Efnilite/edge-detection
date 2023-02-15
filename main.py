@@ -50,7 +50,7 @@ def main():
     print("All good now. Enjoy the show!")
 
     if output == "terminal":
-        to_terminal.play(folder)
+        to_terminal.play(folder, video)
 
     # destroy cv2 instances
     cv2.destroyAllWindows()
