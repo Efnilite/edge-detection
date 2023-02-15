@@ -1,9 +1,6 @@
-import os
-import cv2
-import numpy as np
-import math
 import shutil
-import sys
+
+import cv2
 
 # Get the terminal size
 rows, columns = shutil.get_terminal_size()
@@ -14,6 +11,8 @@ video = cv2.VideoCapture("output_video.mp4")
 
 # Get the total number of frames in the video
 total_frames = int(video.get(cv2.CAP_PROP_FRAME_COUNT))
+
+
 #
 # ASCII_CHARS = [' ', '.', '*', ':', 'o', '&', '8', '#', '@']
 # ASCII_CHARS_COUNT = len(ASCII_CHARS)
@@ -37,7 +36,7 @@ def convert_frame_to_ascii(frame, terminal_width, terminal_height, scale_factor=
     ascii_map = " .:-=+*#%@"
 
     # Convert the grayscale image to ASCII art
-    #TODO: figure out how to do ascii art with the terminal
+    # TODO: figure out how to do ascii art with the terminal
     # ascii_art = ""
     # for row in gray:
     #     for pixel in row:

@@ -1,15 +1,18 @@
 import time
 
-import image_processor
+import cv2
 
-# options
-fps = 30
-sec_time = 218.933333
+import to_ascii
 
-ns_between_frames = 1 / 30 * 10 ** 9
-ns_init_sleep = 1_000_000  # time to initiate sleep
 
-if __name__ == '__main__':
+def play(folder, video):
+    # options
+    fps = video.get(cv2.CAP_PROP_FPS)
+    frames = video.get(cv2.CAP_PROP_FRAME_COUNT)
+    sec_time = frames / fps
+
+    ns_between_frames = 1 / fps * 10 ** 9
+    ns_init_sleep = 1_000_000  # time to initiate sleep
 
     result = 0
     frame = 0
@@ -19,7 +22,7 @@ if __name__ == '__main__':
     while result is not None:
         before = time.time_ns()
 
-        result = image_processor.print_frame(f"resources/bad_apple/{frame}.png")
+        result = to_ascii.print_frame(str(folder / f"{frame}.png"))
 
         # to ensure video plays at 30 fps we need to calculate the time it has taken to print and reduce this
         # from wait so the next frame plays on time
@@ -39,8 +42,10 @@ if __name__ == '__main__':
 
     end = time.time_ns()
 
+    # measure time it took to actually play video
     deltasecs = (end - begin) / 10 ** 9
 
+    # stats
     print(f"Took: {deltasecs} | "
           f"Accuracy: {(deltasecs - sec_time) / sec_time * 100}% | "
           f"Dropped frames: {dropped_frames}")
