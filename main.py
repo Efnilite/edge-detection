@@ -41,8 +41,6 @@ def main():
 
     to_terminal.play(folder, video)
 
-    # destroy cv2 instances, save the memory
-    cv2.destroyAllWindows()
     # remove folder with frames
     shutil.rmtree(folder, ignore_errors=True)
 
