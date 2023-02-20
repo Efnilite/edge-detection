@@ -1,4 +1,5 @@
 import os
+import shutil
 from pathlib import Path
 
 import cv2
@@ -20,17 +21,6 @@ def main():
 
         print("That file does not exist. Try again.")
 
-    print("Enter your desired output method.")
-    print("Type 'terminal' for printing to the terminal and type 'mp4' for converting to an mp4 file.")
-
-    while True:
-        output = input().strip().lower()
-
-        if output == "terminal" or output == "mp4" or output == "video":
-            break
-
-        print("Invalid type. Try again.")
-
     # get the parent folder to do stuff in
     parent = Path(src).parent.absolute()
 
@@ -49,13 +39,12 @@ def main():
     print()
     print("All good now. Enjoy the show!")
 
-    if output == "terminal":
-        to_terminal.play(folder, video)
+    to_terminal.play(folder, video)
 
-    # destroy cv2 instances
+    # destroy cv2 instances, save the memory
     cv2.destroyAllWindows()
     # remove folder with frames
-    os.rmdir(folder)
+    shutil.rmtree(folder, ignore_errors=True)
 
 
 if __name__ == '__main__':

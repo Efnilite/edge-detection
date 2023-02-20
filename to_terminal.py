@@ -6,6 +6,7 @@ import to_ascii
 
 
 def play(folder, video):
+    """Prints a video to the console."""
     # options
     fps = video.get(cv2.CAP_PROP_FPS)
     frames = video.get(cv2.CAP_PROP_FRAME_COUNT)
@@ -32,8 +33,10 @@ def play(folder, video):
         # ~2.5% (224 secs in execution) to ~-0.3% (218 secs in execution)
         ns_to_wait = ns_between_frames - elapsed_time - ns_init_sleep
 
+        # if the ns to wait is negative, aka the reading took too long, add this frame to the "dropped'
         if ns_to_wait < 0:
             dropped_frames.append(frame)
+            # can't wait negative amount of time
             ns_to_wait = 0
 
         frame += 1
