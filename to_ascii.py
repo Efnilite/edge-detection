@@ -1,4 +1,5 @@
 from PIL import Image
+import os
 
 
 def to_image(src):
@@ -8,8 +9,12 @@ def to_image(src):
 
 def to_luminance(image):
     """Returns a 2D-list of all rgba values mapped to the specified detail level."""
-    width = int(220)
-    height = int(63)
+    # width = int(220)
+    # height = int(63)
+    terminal_size = os.get_terminal_size()
+    width = int(terminal_size.columns)
+    height = int(terminal_size.lines)
+
 
     image = image.resize((width, height)).convert("L")
 
