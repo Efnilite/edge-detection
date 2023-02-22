@@ -698,10 +698,245 @@ These lines of code are used to convert the video into an edge detected version 
 ```
 As the final step in this function the videos that were being written are now released ( in other words saved and closed ) and can then be utilized by other parth of the whole program.
 ### to_frames.py
-rooham
+The code inside the file to_frames.py is intended to take a source for a video input and consequently convert that video into it's distinct frames and store these extracted frames into a temporary folder to then be used in furthe rsections of the main application ( ex. by the `to_terminal.py` code). What follows is a detailed description of how everything is put together inside this file. Some sections are not fully ellaborated upon seeing they have been thoroughly explained in previous sections of this document.
+ 
+ ---
+```python
+import math
+import os
+from pathlib import Path
+
+import cv2
+```
+The lines of code here use both previously covered importing syntaxes of the python programming langauge. With one being used to imort the `math`, `os`, and `open-cv` libraries and the other to specifically import the `Path` module from the `pathlib` library.
+
+---
+```python
+def to_frames(src, parent):
+    """Converts the provided video at file path src to all frames in that video."""
+    .
+    .
+    .
+    .
+```
+The function definition of the `to_frames` function as defined here takes two arguments `src` and `parent` quite similar to previously seen functions inside of the `to_edged.py` file. This function, however, does not return anything and everything is local to this function.
+
+
+---
+```python
+    # gets the video
+    video = cv2.VideoCapture(str(parent / "_output.mp4"))
+```
+Using the parent directory of the input video (which is retrieved in the main python file) the output video from the `to_edged.py` call is retrieved and further utilized in the program. The gathering of the data from the video is similar to that in `to_edged.py`.
+
+---
+```python
+    frames = int(video.get(cv2.CAP_PROP_FRAME_COUNT))
+    intervals = list(range(frames))[0::int(frames / 10)]  # for the ... completed messages
+    frame = 0
+```
+See [`to_edged.py`](#to_edgedpy)
+
+---
+```python
+    folder = Path(src).parent.absolute() / "_temp"
+    if not os.path.isdir(folder):
+        os.makedirs(folder)  # create folder
+
+```
+Using the the parent directory of the source file a new path is created for a folder called `_temp`. The a check is ran using the `os` library to see whether this directory already exists, if one already exists nothing is done, however, if such a directory does not exist one is made using the `makedirs` function of the os library.
+
+---
+```python
+    while True:
+        success, image = video.read()
+
+        # if frame is not found, stop and return data to be used in the rest of the code
+        if not success:
+            return folder, video
+
+        cv2.imwrite(str(folder / f"{frame}.png"), image)
+
+        if frame in intervals:
+            print(f"{math.ceil(frame / frames * 100)}% completed... ({frame} / {frames})")
+
+        frame += 1
+```
+Similar to the workings of `to_edged.py` a while loop is utilized in order to sequentially read all frames of the given video and using the `imwrite` function of the `open-cv` library store these into the temporary folder with the name of the file being the index of the given frame inside the video. The rest of the guidelines previously discussed apply to this loop as well.
+### to_ascii.py
+The file `to_ascii.py` is the program file that contains the main logic associated with converting a given image into the ascii representation of that given image. Utilizing the `Pillow` library imported as `PIL` inside of the program the process of this conversion is eased and shall be elaborated upon.
+
+#### Roham's side note: The extensive use of helper functions can be well associated with the programming style of Rens which I highly appreciate. Seperation of concerns is key. My man is and will be a very good functional programmer one day. I just know it :)
+
+---
+```python
+from PIL import Image
+```
+
+This is the first occurence of the usage of the [`Pillow`](https://pillow.readthedocs.io/en/stable/) library inside the program. This library as described on the website of the library is intended to add image processing capabilites to the python interpreter. With it's extensive format support and well-documented codebase it was one of the best options we had. Here we are specifically importing the `Image` module of the `Pillow` library.
+
+---
+```python
+def to_image(src):
+    """Returns a new Image instance to perform operations on."""
+    return Image.open(src)
+```
+Here, the defined `to_image` function takes a soruce/path of an image and returns the image opened using the `open` method of the `Image` module of `PIL`.
+
+---
+```python
+def to_luminance(image):
+    """Returns a 2D-list of all rgba values mapped to the specified detail level."""
+    width = int(220)
+    height = int(63)
+
+    image = image.resize((width, height)).convert("L")
+
+    pixels = list(image.getdata())
+    final = []
+
+    for y in range(height):
+        final.append(pixels[(y * width):((y + 1) * width)])
+
+    return final
+```
+The function definiton for `to_luminance` takes an image as it's only input and returns a transformed version of the image corelated to the luminance values associated with each given pixel in the image. Initially, however, the width and height of the given terminal window are taken and stored in similarly labeled variables. The image is then resized using the `resize` method of the `Image` object. note that here the `convert` method is the also being called for the image before it is stored. This is to transoft the iamge into a single channel image, AKA a luminance values of the image without color i.e. grayscale. Following this, the values for all pixels are retrieved by typecasting the returned value from calling the `getdata` method of the image to a `list`. An aditional array is the created called final which is also the 2D-representations of luminance mapped rgba values that is returned. seeing the returned value of `image.getdata` is a 1-d array we need to convert it to a list of pixel rows. To do this we create a range which include all rows of the array that we need i.e. the height of the iamge in pixels and then split the 1d array of pixels into a final 2d array of n arrays where n represents the pixel height of the image.
+
+---
+```python
+grays = "#@$%&?!*~^;:'+=-_,.` "
+```
+
+This string is an ordered collection of characters that will be used to convert an image into ascii art. sorted in decending order based on darkness, `#` represents the drakest symbol and the `space` represents the lowest value.
+
+---
+```python
+def to_char(luminance):
+    """Transforms a luminance value to an ASCII character."""
+    return grays[int((1 - luminance / 255) * (len(grays) - 1))]
+```
+The `to_char` function as defined here takes in one input that is a given luminance value and returns the associated ascii char from the `grays` collection.
+
+---
+```python
+def print_grid(pixels):
+    """Prints the final pixel grid with the provided pixels at the provided positions."""
+    to_chars = list(map(lambda row: list(map(to_char, row)), pixels))
+
+    total = ""
+
+    for row in to_chars:
+        total += "".join(row) + "\n"
+
+    print(total)
+```
+Provided the returned value from the `to_luminance` function as an argument named `pixels`, the `print_grid` function proceeds to convert the given array of pixels into a string representation and prints it. This function does not return anything. The value of the `to_chars` function is obtained by using the map function which applies a function to all values of a given array; This is first done on the first dimension of the array which then allows to manipulate the specific cells inside this 2-d array. The inner map function applies the previously defined `to_char` method to the all the values. After both map's have finished executing the result is typecased to a list and stored to the `to_chars` array. An empty string called `total` is the created and per row inside the `to_chars` array the concatenated values of the rows as a string are concatenated to the `total` string. additionally at the end of each row string representation a `\n` character is added in order to ensure the image is well represented as a string. To finish things off the `total` string is printed.
+
+---
+```python
+def print_frame(file):
+    """Prints the specified file."""
+    try:
+        img = to_image(file)
+    except FileNotFoundError:
+        return None
+
+    dots = to_luminance(img)
+
+    print_grid(dots)
+
+    return True
+```
+The `print_frame` function as defined here takes in a file as it's only input and proceeds to print it using the previuosly defined helper functions. A `try/catch` statement is included to ensure the programs continues it's processing even if the image fails to load. The prevension of haulting causes the smooth printing process of the frames to the terminal. If the process fails this function returns the value `None` and if all goes well the value returned will be `True`. Initially in this function the image is loaded into a variable called `img` inside of the try block. This image is then transformed into luminance values and printed to the terminal using the previosuly defined functions.
 
 ### to_terminal.py
-rooham
+What follows is the a detailed explanation of the workings of the `to_terminal.py` file. Some lines are not explained seeing constant repetition of certain concepts does not add any additonal value to the report and documentation.
 
-### to_ascii.py
-rooham/wens? idk you pick
+---
+```python
+import time
+import cv2
+import to_ascii
+```
+These import statements, import two libraries and one other previusly elaborated file from the project. This is also the first occurence of the `time` built-in module of python which will be utilized in this file to regulate thread operations and video speed.
+
+---
+```python
+def play(folder, video):
+    """Prints a video to the console."""
+    .
+    .
+    .
+    .
+```
+Given a path folder and video as it's parameters, the `play` function litrally plays a given video inside the terminal where the program is called from.
+
+---
+```python
+    # options
+    fps = video.get(cv2.CAP_PROP_FPS)
+    frames = video.get(cv2.CAP_PROP_FRAME_COUNT)
+    sec_time = frames / fps
+
+    ns_between_frames = 1 / fps * 10 ** 9
+    ns_init_sleep = 1_000_000  # time to initiate sleep
+
+    result = 0
+    frame = 0
+    dropped_frames = []
+    begin = time.time_ns()
+```
+This part of the code resembels other parts of the proejct that utilize the `open-cv` library and how values of certain attributes are retrieved using the `get` method. A new concept however is that of time and video length. The variable `sec_time` contains the length of the video in second. This value is then used to calculate the time between frames in nanosecond and then this value is stored in `ns_between_frames`. Some initial variables are also defined here namely those of `result`, `frame`, `dropped_frames`, and the inital start time of the program stored in `begin`.
+
+---
+```python
+while result is not None:
+        before = time.time_ns()
+
+        result = to_ascii.print_frame(str(folder / f"{frame}.png"))
+
+        # to ensure video plays at 30 fps we need to calculate the time it has taken to print and reduce this
+        # from wait so the next frame plays on time
+        elapsed_time = time.time_ns() - before
+
+        # initiating sleep causes some ns to pass. remove this from time_to_wait to reduce inaccuracy from
+        # ~2.5% (224 secs in execution) to ~-0.3% (218 secs in execution)
+        ns_to_wait = ns_between_frames - elapsed_time - ns_init_sleep
+
+        # if the ns to wait is negative, aka the reading took too long, add this frame to the "dropped'
+        if ns_to_wait < 0:
+            dropped_frames.append(frame)
+            # can't wait negative amount of time
+            ns_to_wait = 0
+
+        frame += 1
+
+        time.sleep(ns_to_wait * 10 ** -9)
+```
+This loop represents the main operation that is running when the terminal is printig the video ( never used that one before :) ). As long as the video is being printed the loop goes on. The whole process of printing the ascii representation is timed through the `before` and `elapsed_time` variables and are then used to calculate sleep time. In the meantime the `print_frame` function as previously defined is called with the current frame of the video as the input.
+
+The previously mentioned elapsed time is then used to calculate wait time by taking the previously calculated `ns_between_frames` and deducting the elapsed time and the estimated intial sleep. If the waiting time is less that 0, meaning the frame took longer than expected it is added to the `dropped_frames` array and the wait time is set to 0. After all these have ran the `frame` counter is incremented and the sleep time is implemented using the `sleep` method from the `time` library.
+
+---
+```python
+   end = time.time_ns()
+
+    # measure time it took to actually play video
+    deltasecs = (end - begin) / 10 ** 9
+
+    # stats
+    print(f"Took: {deltasecs} | "
+          f"Accuracy: {(deltasecs - sec_time) / sec_time * 100}% | "
+          f"Dropped frames: {dropped_frames}")
+```
+After the main loop has finished executing the end time is logged and all the metrics are presented to the user. The time difference stored in `deltasecs` is calculated by taking the difference between the begin and end time and converted to normal seconds from nano seconds by multiplying by 10^9.
+
+Additionally, the accuracy ( meaning the percentage of difference between actual time and time take ) and the dropped frames are printed to the user.
+
+
+## Conclusions
+These explanations conclude our explanation of the code associated with this project. Many Many hours of explaining later we hope to have elaborated enough.
+
+Best of regards
+
+[Roham](https://github.com/RebelOfDeath) and [Rens](https://github.com/Efnilite)
