@@ -1,4 +1,6 @@
-# edge-detection
+# Python Edge Detection Project
+
+Using edge detection, prints the edges of each frame of Bad Apple!! to the console in ASCII-characters. 
 
 ### Installation
 
