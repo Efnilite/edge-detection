@@ -14,5 +14,5 @@ pip install opencv-contrib-python
 ### Running
 
 ```
-python bad_apple.py
+python main.py
 ```
